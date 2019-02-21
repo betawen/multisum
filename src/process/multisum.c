@@ -7,10 +7,11 @@
 
 unsigned long long multisum(unsigned long long m, int n){
     pid_t pid[n];
-    int i;
+    int i,j;
+    unsigned long long k;
     int pip[n][2];
     unsigned long long result = 0;
-    for(int j = 0; j < n; j++){
+    for(j = 0; j < n; j++){
         if(pipe(pip[j]) < 0){
             printf("Failed to create pipe!\n");
             return 0;
@@ -28,14 +29,14 @@ unsigned long long multisum(unsigned long long m, int n){
             unsigned long long start = (m / n) * i + 1;
             unsigned long long end = (m / n) * (i + 1);
             if ( i == (n - 1)) end = m;
-            for (unsigned long long j = start; j <= end; j++){
-                tmp += j;
+            for (k = start; k <= end; k++){
+                tmp += k;
             }
             write(pip[i][1], &tmp, sizeof(tmp));
             return -1;
         }  
     }
-    for(int j = 0; j < n; j++){
+    for(j = 0; j < n; j++){
         close(pip[j][1]);
         waitpid(pid[j], NULL, 0);
         unsigned long long tmp = 0;
