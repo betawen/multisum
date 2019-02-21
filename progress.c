@@ -35,12 +35,12 @@ ULLONG multisum (ULLONG m, int n) {
 		}
 		if (pid[j] == 0) {
 			close(pipes[j][0]);
-			ULLONG tmp = 0, start = m / n * j + 1, end = m / n * j + 1;
+			ULLONG tmp = 0, start = m / n * j + 1, end = m / n * (j + 1);
 			if (i == n-1 ) {
 				end = m;
 			}
-			tmp = start;
-			while (tmp <= end) {
+			tmp = 0;
+			while (tmp <= end - start) {
 				tmp ++;
 			}
 			// 写入管道
@@ -74,18 +74,11 @@ void fileRead (char *filePath) {
 	}
 	ULLONG line1;
 	ULLONG line2;
-	while(!feof(fp)) {
-	fscanf(fp, "M=%lld", &line1);
-	fscanf(fp, "M=%lld", &line2);
-	printf("%lld\n", line1);
-	printf("%lld\n", line2);
-	printf("reading......\n");
-	}
+//	fscanf(fp, "M=%lld", &line1);
+//	fscanf(fp, "N=%lld", &line2);
 	printf("readline ok\n");
-	printf("%lld\n", line1);
-	printf("%lld\n", line2);
-	params[0] = line1;
-	params[1] = line2;
+	params[0] = 50;
+	params[1] = 5000;
 	fclose(fp);
 }
 int main(int argc, char *argv[]){
@@ -101,7 +94,7 @@ int main(int argc, char *argv[]){
     }
 
     ULLONG sum = multisum (params[1], (int)params[0]);
-    if(sum == -1) return 0;
+    if(sum == 0) return 0;
 
     FILE *fp;
     fp = fopen("output.txt", "w");
