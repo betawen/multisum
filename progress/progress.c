@@ -76,6 +76,19 @@ void fileRead (char *filePath) {
 	ULLONG line2;
 	fscanf(fp, "M=%lld", &line1);
 	fscanf(fp, "N=%lld", &line2);
+	int line =1;
+	while(!feof(fp)){
+		char readChar = fgetc(fp);
+		if (readChar == '=' && line == 1) {
+			fscanf(fp, "M=%lld", &line1);
+			line ++;
+		}
+		if (readChar == '=' && line == 2) {
+			fscanf(fp, "M=%lld", &line2);
+			line ++;
+		}
+	}
+	
 	params[0] = line1;
 	params[1] = line2;
 	fclose(fp);
