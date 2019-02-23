@@ -16,7 +16,6 @@ void thread_cal (int thread_id) {
     while(tmp <= end_num[thread_id] - start_num[thread_id]){
         tmp ++;
     }
-    printf("thread_%d: %d\n",thread_id,tmp);
     multiResList[thread_id] = tmp;
     pthread_exit(NULL);
 }
@@ -24,23 +23,18 @@ void thread_cal (int thread_id) {
 ULLONG multisum(ULLONG m, int n) {
     ULLONG sum = 0;
     multiResList = (ULLONG *) malloc (n * sizeof(ULLONG));
-    printf("init\n");
     pthread_t threads[n];
     int i,j,k;
     // 创建线程
     for (i = 0; i < n; i++) {
-	printf("start\n");
         start_num[i] = (m / n) * i + 1;
-	printf("end\n");
         end_num[i] = (m / n) * (i + 1);
-	printf("test\n");
 	end_num[n-1] = m;
         int res = pthread_create(&threads[i], NULL, thread_cal, i);
         if (res != 0) {
             printf("PTHREAD_CREATE ERROR!\n");
             exit(-1);
         }
-	printf("创建成功\n！");
     }
 
     // 计算总和
@@ -92,7 +86,6 @@ int main(int argc, char *argv[]){
     fp = fopen("output.txt", "w");
     fprintf(fp, "%lld", sum);
     fclose(fp);
-    printf("N=%lld, M=%lld\n", params[0], params[1]);
     printf("multisum: %lld\n", sum);
     if (sum == params[1]) {
         printf("True!\n");

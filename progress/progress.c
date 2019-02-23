@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 
 #define ULLONG unsigned long long
 #define MAXM 4294967296
@@ -43,7 +44,6 @@ ULLONG multisum (ULLONG m, int n) {
 			while (tmp <= end - start) {
 				tmp ++;
 			}
-			printf("progress_%d: %lld\n", j, end-start);
 			// 写入管道
 			write(pipes[j][1], &tmp, sizeof(tmp));
 			return 0;
@@ -57,17 +57,13 @@ ULLONG multisum (ULLONG m, int n) {
 		// 从管道读取
 		read(pipes[k][0], &tmp, sizeof(tmp));
 		multisum += tmp;
-		printf("%d\n", tmp);
 	}
 	return multisum;
 }
 
 void fileRead (char *filePath) {
-	printf("start\n");
-	printf("%s\n", filePath);
 	FILE *fp;
 	fp = fopen(filePath, "r");
-	printf("fopen ok\n");
 	if (fp == NULL) {
 		printf('FILE READ FAILED\n');
 		exit(-1);
@@ -87,18 +83,24 @@ void fileRead (char *filePath) {
         params[1] = M;
 }
 int main(int argc, char *argv[]){
+
+    struct timeval start, end;
+
+
     if (argc < 2){
         printf("PARAM ERROR: %s\n", argv[1]);
         return 0;
     }
     fileRead(argv[1]);
-    printf("ok\n");
     if(params[0] < 1 || params[1] < 1 || params[0] >= MAXN || params[1] >= MAXM){
         printf("PARAMS ERROR\n");
         return 0;
     }
 
+    gettimeofday(&start, NULL);
     ULLONG sum = multisum (params[1], (int)params[0]);
+    gettimeofday(&end, NULL);
+
     if(sum == 0) return 0;
 
     FILE *fp;
@@ -107,6 +109,8 @@ int main(int argc, char *argv[]){
     fclose(fp);
     printf("N=%lld, M=%lld\n", params[0], params[1]);
     printf("multisum: %lld\n", sum);
+    printf("use time:%fms\n", (1000000*(end.tv_sec-start.tv_sec) + end.tv_usec-start.tv_usec)/1000.0);
+
     if (sum == params[1]) {
         printf("True!\n");
 	return 0;
