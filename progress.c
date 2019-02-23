@@ -68,7 +68,43 @@ void fileRead (char *filePath) {
 		return -1;
 	}
 	fgets(readLine, 20, fp);
-	if(realLine[0] == 'N') {
-
+	for (int i = 2; i < 20; i++) {
+		if (readLine[i] == '\n') break;
+		if (readLine[0] == 'N') params[0] += readLine[i] - '0';
+		if (readLine[0] == 'M') params[1] += readLine[i] - '0';
 	}
+	fgets(readLine, 20, fp);
+	for (int i = 2; i < 20; i++) {
+		if (readLine[i] == '\n') break;
+		if (readLine[0] == 'N') params[0] += readLine[i] - '0';
+		if (readLine[0] == 'M') params[1] += readLine[i] - '0';
+	}
+}
+
+int main(int argc, char *argv[]){
+    if (argc != 2){
+        printf("PARAM ERROR!\n");
+        return 0;
+    }
+	fileRead(argv[1]);
+    if(params[0] < 1 || params[1] < 1 || params[0] >= MAXN || params[0] >= MAXM){
+        printf("PARAMS ERROR\n");
+        return 0;
+    }
+
+    ULLONG multisum = multisum(params[1], (int)params[0]);
+    if(multisum == -1) return 0;
+
+    FILE *fp;
+    fp = fopen("output.txt", "w");
+    fprintf(fp, "%lld", multisum);
+    fclose(fp);
+    printf("N=%lld, M=%lld\n", params[0], params[1]);
+    printf("multisum: %lld\n", multisum);
+    if (multisum == params[1]) {
+        printf("True!\n");
+    }
+    else
+        printf("False!\n");
+    return 0;
 }
