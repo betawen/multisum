@@ -68,6 +68,8 @@ void fileRead(char *filePath) {
 }
 
 int main(int argc, char *argv[]){
+    clock_t start,end;
+
     if (argc < 2){
         printf("PARAM ERROR: %s\n", argv[1]);
         return 0;
@@ -79,7 +81,9 @@ int main(int argc, char *argv[]){
         return 0;
     }
 
+    start = clock();
     ULLONG sum = multisum (params[1], (int)params[0]);
+    end = clock();
     if(sum == -1) return 0;
 
     FILE *fp;
@@ -87,6 +91,7 @@ int main(int argc, char *argv[]){
     fprintf(fp, "%lld", sum);
     fclose(fp);
     printf("multisum: %lld\n", sum);
+     printf("use time:%0.6fms\n", (end-start)*1000.0/CLOCKS_PER_SEC);
     if (sum == params[1]) {
         printf("True!\n");
 	return 0;
