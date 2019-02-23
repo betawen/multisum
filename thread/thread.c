@@ -7,33 +7,40 @@
 #define MAXM 4294967296
 #define MAXN 100
 ULLONG *multiResList;
-ULLONG *start_num;
-ULLONG *end_num;
+ULLONG start_num[100];
+ULLONG end_num[100];
 ULLONG params[2];
 
 void thread_cal (int thread_id) {
     ULLONG tmp = 0;
-    while(tmp <= end_num - start_num){
+    while(tmp <= end_num[thread_id] - start_num[thread_id]){
         tmp ++;
     }
+    printf("thread_%d: %d\n",thread_id,tmp);
     multiResList[thread_id] = tmp;
     pthread_exit(NULL);
 }
 
-ULLONG multisum(ULLONG m, ULLONG n) {
+ULLONG multisum(ULLONG m, int n) {
     ULLONG sum = 0;
     multiResList = (ULLONG *) malloc (n * sizeof(ULLONG));
+    printf("init\n");
     pthread_t threads[n];
     int i,j,k;
     // 创建线程
-    for (i = 0; i < n - 1; i++) {
+    for (i = 0; i < n; i++) {
+	printf("start\n");
         start_num[i] = (m / n) * i + 1;
+	printf("end\n");
         end_num[i] = (m / n) * (i + 1);
+	printf("test\n");
+	end_num[n-1] = m;
         int res = pthread_create(&threads[i], NULL, thread_cal, i);
         if (res != 0) {
             printf("PTHREAD_CREATE ERROR!\n");
             exit(-1);
         }
+	printf("创建成功\n！");
     }
 
     // 计算总和
@@ -54,9 +61,13 @@ void fileRead(char *filePath) {
         exit(-1);
     }
     fscanf(fp, "M=%lld", &m);
+    printf("%lld\n",m);
+    fgetc(fp);
+    printf("%lld\n",n);
     fscanf(fp, "N=%lld", &n);
-    params[1] = m;
-    params[0] = n;
+    printf("%lld\n",n);
+    params[1] = 1000;
+    params[0] = 10;
     fclose(fp);
 }
 
