@@ -35,14 +35,15 @@ ULLONG multisum (ULLONG m, int n) {
 		}
 		if (pid[j] == 0) {
 			close(pipes[j][0]);
-			ULLONG tmp = 0, start = m / n * j + 1, end = m / n * j + 1;
-			if (i == n-1 ) {
+			ULLONG tmp = 0, start = m / n * j + 1, end = m / n * (j + 1);
+			if (j == n-1 ) {
 				end = m;
 			}
-			tmp = start;
-			while (tmp <= end) {
+			tmp = 0;
+			while (tmp <= end - start) {
 				tmp ++;
 			}
+			printf("progress_%d: %lld\n", j, end-start);
 			// 写入管道
 			write(pipes[j][1], &tmp, sizeof(tmp));
 			return 0;
@@ -56,6 +57,7 @@ ULLONG multisum (ULLONG m, int n) {
 		// 从管道读取
 		read(pipes[k][0], &tmp, sizeof(tmp));
 		multisum += tmp;
+		printf("%d\n", tmp);
 	}
 	return multisum;
 }
@@ -64,34 +66,25 @@ void fileRead (char *filePath) {
 	printf("start\n");
 	printf("%s\n", filePath);
 	FILE *fp;
-	char readLine[20];
-	int i;
 	fp = fopen(filePath, "r");
 	printf("fopen ok\n");
 	if (fp == NULL) {
 		printf('FILE READ FAILED\n');
 		exit(-1);
 	}
-	ULLONG line1;
-	ULLONG line2;
-	fscanf(fp, "M=%lld", &line1);
-	fscanf(fp, "N=%lld", &line2);
-	int line =1;
-	while(!feof(fp)){
-		char readChar = fgetc(fp);
-		if (readChar == '=' && line == 1) {
-			fscanf(fp, "M=%lld", &line1);
-			line ++;
-		}
-		if (readChar == '=' && line == 2) {
-			fscanf(fp, "M=%lld", &line2);
-			line ++;
-		}
-	}
-	
-	params[0] = line1;
-	params[1] = line2;
-	fclose(fp);
+	ULLONG M;
+	ULLONG N;
+        char temp_char = '\0';
+        char nums[20];
+        ULLONG temp_num = 0;
+        fscanf(fp,"%c=%lld\n",&temp_char, &temp_num);
+        (temp_char == 'M') ? (M = temp_num) : (N = temp_num);
+        fscanf(fp,"%c=%lld\n",&temp_char, &temp_num);
+        (temp_char == 'N') ? (N = temp_num) : (M = temp_num);
+        printf("thread num: %lld\nnum to sum: %lld\n",N, M);
+        fclose(fp);
+        params[0] = N;
+        params[1] = M;
 }
 int main(int argc, char *argv[]){
     if (argc < 2){
@@ -106,7 +99,7 @@ int main(int argc, char *argv[]){
     }
 
     ULLONG sum = multisum (params[1], (int)params[0]);
-    if(sum == -1) return 0;
+    if(sum == 0) return 0;
 
     FILE *fp;
     fp = fopen("output.txt", "w");

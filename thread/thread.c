@@ -53,28 +53,24 @@ ULLONG multisum(ULLONG m, int n) {
 
 void fileRead(char *filePath) {
     FILE *fp;
-    ULLONG line1;
-    ULLONG line2;
-    fp = fopen(filePath, "w");
+    ULLONG M;
+    ULLONG N;
+    fp = fopen(filePath, "r");
     if ( fp == NULL ) {
         printf("FILEREAD FAILD!\n");
         exit(-1);
     }
-    int line = 1;
-	while(!feof(fp)){
-		char readChar = fgetc(fp);
-		if (readChar == '=' && line == 1) {
-			fscanf(fp, "M=%lld", &line1);
-			line ++;
-		}
-		if (readChar == '=' && line == 2) {
-			fscanf(fp, "M=%lld", &line2);
-			line ++;
-		}
-	}
-    params[1] = 1000;
-    params[0] = 10;
+    char temp_char = '\0';
+    char nums[20];
+    ULLONG temp_num = 0;
+    fscanf(fp,"%c=%lld\n",&temp_char, &temp_num);
+    (temp_char == 'M') ? (M = temp_num) : (N = temp_num);
+    fscanf(fp,"%c=%lld\n",&temp_char, &temp_num);
+    (temp_char == 'N') ? (N = temp_num) : (M = temp_num);
+    printf("thread num: %lld\nnum to sum: %lld\n",N, M);
     fclose(fp);
+    params[0] = N;
+    params[1] = M;
 }
 
 int main(int argc, char *argv[]){
